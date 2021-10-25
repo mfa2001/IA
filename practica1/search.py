@@ -139,10 +139,25 @@ def uniformCostSearch(problem):
     fringe=util.PriorityQueue()
     fringe.push(n_start,0)
 
-    generated[n.state] = ("F",0)
+    generated[n_start.state] = ("F",0)
     while not fringe.isEmpty():
-        pass
+        n = fringe.pop()
+        if problem.isGoalState(n.state):
+            return n.total_path()
+        if generated[n.state][0] == "E":
+            #Node has been expanded, continue
+            continue
+        generated[n.state] = ("E",n.cost)
+        for s,a,c in problem.getSuccessors(n.state):
+            ns = Node(s,n,a,n.cost + c)
+            if ns.state not in generated:
+                fringe.push(ns,ns.cost)
+                generated[ns.state] = ("F",ns.cost)
+            elif generated[ns.state][0] == "F" and generated[ns.state][1] > ns.cost:
+                fringe.update(ns,ns.cost)
+                generated[ns.state] = ("F",ns.cost)
     raise Exception
+
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
