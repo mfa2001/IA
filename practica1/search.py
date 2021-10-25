@@ -103,27 +103,25 @@ def breadthFirstSearch(problem):
 
     Fringe conjunto de nodos los cuales se van expandiendo, el primero sera el estado inicial
     """
-
-    fringe={Node(problem.getStartState())}
-    expanded=[]
-    while True:
-        if len(fringe)==0:
-             raise Exception
+    fringe=util.Queue()
+    n_start=Node(problem.getStartState())
+    if problem.isGoalState(n_start.state):
+        return n_start.total_path
+    fringe.push(n_start)
+    generated=set()
+    while not fringe.isEmpty():
         n = fringe.pop()
-        #print("element poped:",n.state)
-        #print(fringe)
-        if problem.isGoalState(n.state):
-            return n.total_path()
-        expanded.append(n.state)
-        #print (expanded)
-        for elem in problem.getSuccessors(n.state):
-            if(elem[0] != state.state for state in fringe):
-                if (elem[0] not in expanded):
-                    #print("elements: ",elem[0])
-                    fringe.add(Node(elem[0],n,elem[1],elem[2]))
-        
-        
+        generated.add(n.state) #Expandes
+        for s,a,c in problem.getSuccessors(n.state):
+                curr_node=Node(s,n,a,n.cost + c)
+                if curr_node.state not in generated: #Not in exapnded not int fringe
+                    if problem.isGoalState(curr_node.state):
+                        return curr_node.total_path()
+                    fringe.push(curr_node)
+                    generated.add(curr_node.state) #Frigne
+    raise Exception
 
+  
 
     """
     Implementacion en grafo: state in fringe or state in expanded
@@ -135,9 +133,16 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    n_start=Node(problem.getStartState())
 
+    generated = {}
+    fringe=util.PriorityQueue()
+    fringe.push(n_start,0)
 
+    generated[n.state] = ("F",0)
+    while not fringe.isEmpty():
+        pass
+    raise Exception
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
