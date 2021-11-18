@@ -17,10 +17,9 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-from graphicsUtils import sleep
 from node import Node
-from game import Directions
 import util
+
 
 
 class SearchProblem:
@@ -140,6 +139,7 @@ def breadthFirstSearch(problem):
                     generated.add(curr_node.state) #Frigne
     raise Exception
 
+
   
 
     """
@@ -188,7 +188,31 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    n_start=Node(problem.getStartState())
+
+    generated = {}
+    fringe=util.PriorityQueue()
+    h_cost = heuristic(n_start.state,problem)
+    fringe.push(n_start,h_cost)
+
+    generated[n_start.state] = ("F",h_cost)
+    while not fringe.isEmpty():
+        n = fringe.pop()
+        if problem.isGoalState(n.state):
+            return n.total_path()
+        if generated[n.state][0] == "E":
+            #Node has been expanded, continue
+            continue
+        generated[n.state] = ("E",n.cost+heuristic(n.state,problem))
+        for s,a,c in problem.getSuccessors(n.state):
+            ns = Node(s,n,a,n.cost + c + heuristic(s,problem))
+            if ns.state not in generated:
+                fringe.push(ns,ns.cost)
+                generated[ns.state] = ("F",ns.cost)
+            elif generated[ns.state][0] == "F" and generated[ns.state][1] > ns.cost:
+                fringe.update(ns,ns.cost)
+                generated[ns.state] = ("F",ns.cost)
+    raise Exception
 
 
 # Abbreviations
