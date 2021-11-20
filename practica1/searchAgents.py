@@ -470,7 +470,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
-def foodHeuristic(state, problem):
+def foodHeuristic(state, problem: FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
 
@@ -500,7 +500,14 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    food_to_eat = foodGrid.asList()
+    result = []
+    for food in food_to_eat:
+        minDistance = mazeDistance(position,food,problem.startingGameState)
+        distance = util.manhattanDistance(position,food)
+
+        result.append(min(minDistance,distance))
+    return max(result)
 
 
 class ClosestDotSearchAgent(SearchAgent):
