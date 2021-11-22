@@ -184,9 +184,6 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def functionA(problem,state,heuristic):
-    return problem.getCostOfActions(state[1]) + heuristic(state[0],problem)
-
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
@@ -207,7 +204,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             continue
         generated[n.state] = ("E",n.cost+heuristic(n.state,problem))
         for s,a,c in problem.getSuccessors(n.state):
-            ns = Node(s,n,a,problem.getCostOfActions(n.total_path()) + c + heuristic(s,problem))
+            ns = Node(s,n,a,problem.getCostOfActions(n.total_path()) \
+                + c + heuristic(s,problem))
             if ns.state not in generated:
                 fringe.push(ns,ns.cost)
                 generated[ns.state] = ("F",ns.cost)

@@ -392,7 +392,8 @@ def cornersHeuristic(state, problem):
 
     while new_corners: #mientras haya corners que visitar
 
-        distance,corner = min([(util.manhattanDistance(cur_pos,corner),corner)for corner in new_corners])
+        distance,corner = \
+            min([(util.manhattanDistance(cur_pos,corner),corner)for corner in new_corners])
         
         result += distance
         new_corners.remove(corner)
@@ -502,12 +503,12 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     "*** YOUR CODE HERE ***"
     food_to_eat = foodGrid.asList()
     result = []
-    for food in food_to_eat:
-        minDistance = mazeDistance(position,food,problem.startingGameState)
-        distance = util.manhattanDistance(position,food)
+    if len(food_to_eat) == 0:
+        return 0
 
-        result.append(min(minDistance,distance))
-    return max(result)
+    result = max([util.manhattanDistance(position,food)for food in food_to_eat])
+
+    return result #SI buscamos en minimo en este caso la heuristica no seria admisible
 
 
 class ClosestDotSearchAgent(SearchAgent):
