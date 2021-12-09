@@ -89,24 +89,37 @@ class WCNFFormula(object):
         """Generates a new formula that is the 1,3-WPM equivalent
         of this one."""
         formula13 = WCNFFormula()
-        print("Hard:\n",self.hard," \nSoft:\n",self.soft)
+        #print("Hard:\n",self.hard," \nSoft:\n",self.soft)
         for w_soft,c_soft in self.soft:
-            formula13._add_clause(c_soft,weight=w_soft)
-        for c_hard in self.hard:
             b = self.new_var()
-            formula13._add_clause([-b],weight=TOP_WEIGHT)
-            if len(c_hard) > 3:
-                while len(c_hard) > 3:   
-                    new_hard = []
-                    new_hard.append(c_hard[0])
-                    new_hard.append(c_hard[1])
-                    new_hard.append(b)
-                    formula13._add_clause(new_hard,weight=TOP_WEIGHT)
-                    c_hard = c_hard[2:]
+            if len(c_soft) > 3:
+                formula13._add_clause([-b],w_soft)
+                c_soft.append(b)
+                new_literal = []
+                while len(c_soft) >= 3:
+                    while len(new_literal) < 2:
+                        new_literal.append(c_soft[0])
+                        c_soft = c_soft[1:]
+                    new_literal.append(self.new_var())
+                    formula13._add_clause(new_literal,weight=TOP_WEIGHT)
+                    #print("new Literal:",new_literal,"\n")
+                    new_literal = new_literal[2:]
+                new_literal.append(c_soft[0])
+                new_literal.append(c_soft[1])
+                formula13._add_clause(new_literal,weight=TOP_WEIGHT)
+            elif len(c_soft) == 1:
+                formula13._add_clause(c_soft,weight=w_soft)
             else:
-                formula13._add_clause([c_hard,b],weight=TOP_WEIGHT)
-
-        print(formula13.hard)
+                formula13._add_clause([-b],w_soft)
+                c_soft.append(b)
+                formula13._add_clause(c_soft,weight=TOP_WEIGHT)
+                #print("new Literal:",new_literal,"\n")
+        """
+        for c_hard in self.hard:
+            formula13._add_clause(c_hard,weight=TOP_WEIGHT)
+        """            
+        #print("Hard:\n",formula13.hard)
+        #print("Soft:\n",formula13.soft)
         return formula13
 
     def sum_soft_weights(self):
