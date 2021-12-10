@@ -91,14 +91,15 @@ class WCNFFormula(object):
         formula13 = WCNFFormula()
         print("Hard:\n",self.hard," \nSoft:\n",self.soft)
         for w_soft,c_soft in self.soft:
-            b = formula13.new_var()
             if len(c_soft) > 3:
-                formula13.add_clause([-b],w_soft)
-                c_soft.append(b)
                 new_literal = []
                 highest_var = max(abs(l) for l in c_soft)
                 while formula13.num_vars < highest_var:
                     formula13.new_var()
+                b = formula13.new_var()
+                formula13.add_clause([-b],w_soft)
+                c_soft.append(b)
+                print("this is soft",c_soft)
                 while len(c_soft) >= 3:
                     while len(new_literal) < 2:
                         new_literal.append(c_soft[0])
@@ -122,7 +123,7 @@ class WCNFFormula(object):
         for c_hard in self.hard:
             if len(c_hard) < 3:
                 while len(c_hard) < 3:
-                    c_hard.append(formula13.new_var())
+                    c_hard.append(c_hard[0])
                 formula13.add_clause(c_hard,weight=TOP_WEIGHT)
             else:
                 new_literal = []
