@@ -89,96 +89,53 @@ class WCNFFormula(object):
         """Generates a new formula that is the 1,3-WPM equivalent
         of this one."""
         formula13 = WCNFFormula()
-        print("Hard:\n",self.hard," \nSoft:\n",self.soft)
-        b = formula13.new_var()
-        for w_soft,c_soft in self.soft:
-            if len(c_soft) > 3:
-                new_literal = []
-                highest_var = max(abs(l) for l in c_soft)
-                while formula13.num_vars < highest_var:
-                    formula13.new_var()
-                formula13.add_clause([-b],w_soft)
-                c_soft.append(b)
-                print("this is soft",c_soft)
-                while len(c_soft) >= 3:
-                    while len(new_literal) < 2:
-                        new_literal.append(c_soft[0])
-                        c_soft = c_soft[1:]
-                    new_literal.append(formula13.new_var())
-                    formula13.add_clause(new_literal,weight=TOP_WEIGHT)
-                    #print("new Literal:",new_literal,"\n")
-                    new_literal = new_literal[2:]
-                new_literal.append(c_soft[0])
-                new_literal.append(c_soft[1])
-                formula13.add_clause(new_literal,weight=TOP_WEIGHT)
-            elif len(c_soft) == 1:
-                formula13.add_clause(c_soft,weight=w_soft)
-            else:
-                formula13.add_clause([-b],w_soft)
-                c_soft.append(b)
-                formula13.add_clause(c_soft,weight=TOP_WEIGHT)
-                #print("new Literal:",new_literal,"\n")
 
-            
         for c_hard in self.hard:
-            if len(c_hard) < 3:
-                while len(c_hard) < 3:
-                    c_hard.append(c_hard[0])
-                formula13.add_clause(c_hard,weight=TOP_WEIGHT)
-            else:
-                new_literal = []
-                highest_var = max(abs(l) for l in c_hard)
-                while formula13.num_vars < highest_var:
-                    formula13.new_var()
-                while len(c_hard) >= 3:
-                    while len(new_literal) < 2:
-                        new_literal.append(c_hard[0])
-                        c_hard = c_hard[1:]
-                    new_literal.append(formula13.new_var())
-                    formula13.add_clause(new_literal,weight=TOP_WEIGHT)
-                    #print("new Literal:",new_literal,"\n")
-                    new_literal = new_literal[2:]
-                new_literal.append(c_hard[0])
-                new_literal.append(c_hard[1])
-                formula13.add_clause(new_literal,weight=TOP_WEIGHT)
-                
-
+            highest_var = max(abs(l) for l in c_hard)
+            while formula13.num_vars < highest_var:
+                formula13.new_var()
+            formula13.transfomr_1_3_clusule(c_hard,"hard",TOP_WEIGHT)
+        for w_soft,c_soft in self.soft:
+            highest_var = max(abs(l) for l in c_soft)
+            while formula13.num_vars < highest_var:
+                formula13.new_var()
+            formula13.transfomr_1_3_clusule(c_soft,"soft",w_soft)
         #print("Hard:\n",formula13.hard)
         #print("Soft:\n",formula13.soft)
         return formula13
-    
-    def 1_3transform_clusule(self,clausule,type,1_3weight):            
-            if len(list_literals) > 3:
-                if type == "soft":
-                    b = formula13.new_var()
-                    formula13.add_clausule([-b],weight=1_3weight)
-                    list_literals.append(b)
-                new_literal = []
-                highest_var = max(abs(l) for l in clausule)
-                while formula13.num_vars < highest_var:
-                    formula13.new_var()
-                while len(list_literals) < 3:
-                    while len(new_literal) < 2:
-                        new_literal.append(clausule[0])
-                        clausule = clausule[1:]
-                    new_literal.append(formula13.new_var())
-                    formula13.add_clause(new_literal,weight=TOP_WEIGHT)
+
+    def transfomr_1_3_clusule(self,clausule,type,weight1_3):            
+        if len(clausule) > 3:
+            if type == "soft":
+                b = self.new_var()
+                self.add_clause([-b],weight=weight1_3)
+                clausule.append(b)
+            new_literal = []
+            while len(clausule) >= 3:
+                while len(new_literal) < 2:
+                    new_literal.append(clausule[0])
+                    clausule = clausule[1:]
+                new_literal.append(self.new_var())
+                self.add_clause(new_literal,weight=TOP_WEIGHT)
+                new_literal = new_literal[2:]
+            new_literal.append(clausule[0])
+            new_literal.append(clausule[1])
+            self.add_clause(new_literal,weight=TOP_WEIGHT)
+        else:
+            if type == "hard":
+                while len(clausule) < 3:
+                    clausule.append(clausule[0])
+                    self.new_var()
+                self.add_clause(clausule,weight=TOP_WEIGHT)
             else:
-                if type == "hard":
-                    while len(c_hard) < 3:
-                        clausule.append(clausule[0])
-                    formula13.add_clause(clausule,weight=TOP_WEIGHT)
+                if len(clausule) ==  1:
+                    self.add_clause(clausule,weight=weight1_3)
                 else:
-                    if len(clausule) ==  1:
-                        formula13.add_clause(clausule,weight=1_3weight)
-                    else:
-                        b = formula13.new_var()
-                        formula13.add_clause([-b],1_3weight)
-                        clausule.append(b)
-                        formula13.add_clause(clausule,weight=TOP_WEIGHT)
-                
-            
-        
+                    b = self.new_var()
+                    self.add_clause([-b],weight1_3)
+                    clausule.append(b)
+                    self.add_clause(clausule,weight=TOP_WEIGHT)
+
     def sum_soft_weights(self):
         return self._sum_soft_weights
 
