@@ -136,7 +136,8 @@ class Graph(object):
                     pass
                 else:
                     edge = (v1,v2)
-                    if edge not in self.edges:         
+                    if edge not in self.edges:  
+                        v1,v2 = nodes[v1-1],nodes[v2-1]       
                         formula.add_clause([-v1,-v2],weight=wcnf.TOP_WEIGHT)
         #Solve formula
         print("MCLIQUE",file=sys.stderr)

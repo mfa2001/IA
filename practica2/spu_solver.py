@@ -21,7 +21,6 @@ def read(path):
         spuForm.header = _file.readline().strip("\n").split(" ")
         for line in _file:
             row = line.strip("\n").split(" ")
-            literal = []
             if row[0] == "n":
                 list_literal[row[1]] = i
                 i+=1
@@ -31,6 +30,8 @@ def read(path):
             else:
                 spuForm.hard_conf.append(create_clause(row[1:],list_literal))
 
+
+    #Generar el diccionario con las variables de la formula asociadas a los paquetes; Ejemplo: 1:pckg1  2:pckg2 ....
     dictionary = {}
     for pkg in list_literal:
         dictionary[list_literal[pkg]] = pkg
@@ -42,9 +43,12 @@ def transform_formula(problem: SPUFormula):
     highest_var = max(abs(l) for l in problem.soft)
     while form.num_vars < highest_var:
              form.new_var()
+
+    #Añadir clausulas soft
     for c in problem.soft:
         form.add_clause([c],weight=1)
     
+    #Añadir clausulas hard(dependencies)
     for c in problem.hard_dep:
         new_literal = []
         new_literal.append(-c[0])
@@ -52,14 +56,13 @@ def transform_formula(problem: SPUFormula):
             new_literal.append(clausul)
         form.add_clause(new_literal,wcnf.TOP_WEIGHT)
 
-
+    #Añadir clausulas hard(conflicts)
     for c in problem.hard_conf:
         new_literal = []
         for clausul in c:
             new_literal.append(-clausul)
         form.add_clause(new_literal,wcnf.TOP_WEIGHT)
     return form
-        
 
 
 def create_clause(clausule,list_lit):
@@ -85,7 +88,7 @@ if __name__ == "__main__":
             if n < 0:
                 not_installed.append(dictionary[abs(n)])
                 number_not_installed+=1
-        print("The Optimal number 'o' is: ",problem.optim)
+        #print("The Optimal number 'o' is: ",problem.optim)
         print("o ",number_not_installed)
         print("v ", ' '.join([v for v in not_installed]))
 

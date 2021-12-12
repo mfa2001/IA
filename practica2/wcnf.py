@@ -94,17 +94,17 @@ class WCNFFormula(object):
             highest_var = max(abs(l) for l in c_hard)
             while formula13.num_vars < highest_var:
                 formula13.new_var()
-            formula13.transfomr_1_3_clusule(c_hard,"hard",TOP_WEIGHT)
+            formula13.transform_1_3_clausule(c_hard,"hard",TOP_WEIGHT)
         for w_soft,c_soft in self.soft:
             highest_var = max(abs(l) for l in c_soft)
             while formula13.num_vars < highest_var:
                 formula13.new_var()
-            formula13.transfomr_1_3_clusule(c_soft,"soft",w_soft)
+            formula13.transform_1_3_clausule(c_soft,"soft",w_soft)
         #print("Hard:\n",formula13.hard)
         #print("Soft:\n",formula13.soft)
         return formula13
 
-    def transfomr_1_3_clusule(self,clausule,type,weight1_3):            
+    def transform_1_3_clausule(self,clausule,type,weight1_3):            
         if len(clausule) > 3:
             if type == "soft":
                 b = self.new_var()
