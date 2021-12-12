@@ -85,9 +85,9 @@ if __name__ == "__main__":
             if n < 0:
                 not_installed.append(dictionary[abs(n)])
                 number_not_installed+=1
-        
+        print("The Optimal number 'o' is: ",problem.optim)
         print("o ",number_not_installed)
-        print("v ", '--'.join([v for v in not_installed]))
+        print("v ", ' '.join([v for v in not_installed]))
 
 
     else:
