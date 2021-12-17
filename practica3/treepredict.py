@@ -169,13 +169,9 @@ def buildtree(part: Data, scoref=entropy, beta=0):
     #Usamos beta, Logica de beta
     if best_gain < beta:
         return DecisionNode(results = unique_counts(part))
-    
-    set1,set2 = best_sets
-    col_idx,value = best_criteria
-    tb = buildtree(set1,scoref,beta)
-    fb = buildtree(set2,scoref,beta)
 
-    return DecisionNode(col=col_idx,value=value,tb=tb,fb=fb)
+    return DecisionNode(col=best_criteria[0], value=best_criteria[1],
+        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]))
     
     """
     Scoref representa el indice de impureza
@@ -195,6 +191,11 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     t10: Define the iterative version of the function buildtree
     """
     raise NotImplementedError
+
+    
+def classify(tree, values):
+    raise NotImplementedError
+
 
 
 def print_tree(tree, headers=None, indent=""):
@@ -217,6 +218,23 @@ def print_tree(tree, headers=None, indent=""):
         print(f"{indent}F->")
         print_tree(tree.fb, headers, indent + "  ")
 
+def print_data(headers, data):
+    colsize = 15
+    print('-' * ((colsize + 1) * len(headers) + 1))
+    print("|", end="")
+    for header in headers:
+        print(header.center(colsize), end="|")
+    print("")
+    print('-' * ((colsize + 1) * len(headers) + 1))
+    for row in data:
+        print("|", end="")
+        for value in row:
+            if isinstance(value, (int, float)):
+                print(str(value).rjust(colsize), end="|")
+            else:
+                print(value.ljust(colsize), end="|")
+        print("")
+    print('-' * ((colsize + 1) * len(headers) + 1))
 
 def main():
     try:   
@@ -224,7 +242,8 @@ def main():
     except IndexError:
         filename = "decision_tree_example.txt"
     headres,data = read(filename)
-    
+
+    """
     for value in ["USA","France","UK","NewZealand"]:
         set1, set2 = divideset(data,1,value)
         print("Split by:",value)
@@ -232,6 +251,8 @@ def main():
         print("gini set2:",gini_impurity(set2))
         print("entropy set1:",entropy(set1))
         print("entropy set2:",entropy(set2))
+    """
+
     tree = buildtree(data)
     print_tree(tree,headres)
 
