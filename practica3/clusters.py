@@ -51,8 +51,8 @@ class BiCluster:
         self.right = right
         self.vec = vec
         self.id = id
-        self.distance = distance
-
+        self.distance = dist
+        
 def hcluster(rows, distance=pearson):
     distances = {}  # Cache of distance calculations
     currentclustid = -1  # Non original clusters have negative id
