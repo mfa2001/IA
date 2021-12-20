@@ -117,7 +117,9 @@ class WCNFFormula(object):
                     clausule = clausule[1:]
                 new_literal.append(self.new_var())
                 self.add_clause(new_literal,weight=TOP_WEIGHT)
-                new_literal = new_literal[2:]
+                lit = new_literal[2]
+                new_literal = new_literal[3:]
+                new_literal.append(-lit)
             new_literal.append(clausule[0])
             new_literal.append(clausule[1])
             self.add_clause(new_literal,weight=TOP_WEIGHT)
