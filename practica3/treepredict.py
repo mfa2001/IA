@@ -187,6 +187,7 @@ def _get_values(rows,col_idx):
     return value
 
 def iterative_buildtree(part: Data, scoref=entropy, beta=0):
+    #LIMPIAR CODIGO
     """
     t10: Define the iterative version of the function buildtree
     """
@@ -210,7 +211,7 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     data.append(part)
     i = 0 
     while len(nodes) != 0:
-        data_part = data.pop()
+        data_part :DecisionNode = data.pop() 
         # Set up some variables to track the best criteria
         curr_node = nodes.pop()
         i+=1
@@ -249,11 +250,6 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
         data.append(best_sets[1])
         if i == 1:
             node_return = curr_node
-
-
-    #2-Buscar mejor pregunta
-    #Usamos beta, Logica de beta
-
     
     """
     Scoref representa el indice de impureza
@@ -266,6 +262,9 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     
 def classify(tree, values):
     raise NotImplementedError
+
+def prune():
+    raise NotImplementedError#
 
 
 
