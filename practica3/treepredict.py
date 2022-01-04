@@ -190,6 +190,66 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     """
     t10: Define the iterative version of the function buildtree
     """
+
+    """
+    t9: Define a new function buildtree. This is a recursive function
+    that builds a decision tree using any of the impurity measures we
+    have seen. The stop criterion is max_s\Delta i(s,t) < \beta
+    """
+
+    """
+    1-Calcular impureza del node ; Nos la proporciona el codigo 
+    2-Decidir mejor pregunta
+    3-recursividad
+    """
+    data_part = []
+    data_part.append(part)
+    print(data_part)
+    exit(-1)
+    while len(data_part != 0):
+        # Set up some variables to track the best criteria
+        best_gain = 0
+        best_criteria = None
+        best_sets = None
+
+        n_cols = len(data_part[0]) -1
+
+        #1-Calcular impureza
+        current_score = scoref(data_part)
+
+        #No usamos Beta
+        if current_score == 0:
+            return DecisionNode(
+                results=unique_counts(data_part)
+            )
+        for col_idx in range(n_cols):
+            for value in _get_values(data_part,col_idx):
+                set1, set2 = divideset(data_part,col_idx,value)
+                dism_true = len(set1) / len(data_part) * scoref(set1)
+                dism_false = len(set2) / len(data_part) *scoref(set2)
+                gain = current_score - dism_true - dism_false
+                if gain > best_gain:
+                    best_gain = gain
+                    best_criteria = (col_idx,value)
+                    best_sets = set1,set2
+            
+    return DecisionNode()
+
+    #2-Buscar mejor pregunta
+    
+    #Usamos beta, Logica de beta
+    if best_gain < beta:
+        return DecisionNode(results = unique_counts(part))
+
+    return DecisionNode(col=best_criteria[0], value=best_criteria[1],
+        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]))
+    
+    """
+    Scoref representa el indice de impureza
+
+    Cada particion disminuye la impureza por ello a mas ganancia, la impureza estara mas reduida.
+    Valor de goodnes mas grande *Apuntes*
+    """
     raise NotImplementedError
 
     
@@ -253,9 +313,10 @@ def main():
         print("entropy set2:",entropy(set2))
     """
 
-    tree = buildtree(data)
-    print_tree(tree,headres)
-
+    #tree = buildtree(data)
+    #print_tree(tree,headres)
+    tree = iterative_buildtree(data)
+    print_tree(tree)
 
     """
     print(headres)
