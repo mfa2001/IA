@@ -202,26 +202,31 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     2-Decidir mejor pregunta
     3-recursividad
     """
-    data_part = []
-    data_part.append(part)
-    print(data_part)
-    exit(-1)
-    while len(data_part != 0):
+    if len(part) == 0:
+        return DecisionNode()
+    nodes = []
+    nodes.append(DecisionNode())
+    data = []
+    data.append(part)
+    i = 0 
+    while len(nodes) != 0:
+        data_part = data.pop()
         # Set up some variables to track the best criteria
+        curr_node = nodes.pop()
+        i+=1
         best_gain = 0
         best_criteria = None
         best_sets = None
 
-        n_cols = len(data_part[0]) -1
+        n_cols = len(part[0]) -1
 
         #1-Calcular impureza
         current_score = scoref(data_part)
 
         #No usamos Beta
         if current_score == 0:
-            return DecisionNode(
-                results=unique_counts(data_part)
-            )
+            curr_node.results = unique_counts(data_part)
+            continue
         for col_idx in range(n_cols):
             for value in _get_values(data_part,col_idx):
                 set1, set2 = divideset(data_part,col_idx,value)
@@ -232,17 +237,23 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
                     best_gain = gain
                     best_criteria = (col_idx,value)
                     best_sets = set1,set2
-            
-    return DecisionNode()
+        if best_gain < beta:
+            curr_node.results = unique_counts(data_part)
+        curr_node.col = best_criteria[0]
+        curr_node.value = best_criteria[1]
+        curr_node.tb = DecisionNode()
+        nodes.append(curr_node.tb)
+        data.append(best_sets[0])
+        curr_node.fb = DecisionNode()
+        nodes.append(curr_node.fb)
+        data.append(best_sets[1])
+        if i == 1:
+            node_return = curr_node
+
 
     #2-Buscar mejor pregunta
-    
     #Usamos beta, Logica de beta
-    if best_gain < beta:
-        return DecisionNode(results = unique_counts(part))
 
-    return DecisionNode(col=best_criteria[0], value=best_criteria[1],
-        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]))
     
     """
     Scoref representa el indice de impureza
@@ -250,7 +261,7 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     Cada particion disminuye la impureza por ello a mas ganancia, la impureza estara mas reduida.
     Valor de goodnes mas grande *Apuntes*
     """
-    raise NotImplementedError
+    return node_return
 
     
 def classify(tree, values):
@@ -316,7 +327,10 @@ def main():
     #tree = buildtree(data)
     #print_tree(tree,headres)
     tree = iterative_buildtree(data)
-    print_tree(tree)
+    tree2 = buildtree(data)
+    print_tree(tree,headres)
+    print("----------")
+    print_tree(tree2,headres)
 
     """
     print(headres)
