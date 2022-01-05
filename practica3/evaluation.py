@@ -1,6 +1,8 @@
 import random
 from typing import Union, List
 
+from treepredict import DecisionNode
+
 
 def train_test_split(dataset, test_size: Union[float, int], seed=None):
     if seed:
@@ -22,8 +24,10 @@ def train_test_split(dataset, test_size: Union[float, int], seed=None):
     return train, test
 
 
-def get_accuracy(classifier, dataset):
-    raise NotImplementedError
+def get_accuracy(classifier: DecisionNode, dataset):
+    classify =  {}
+    for data in dataset[-1]:
+        classify[data] =+1
 
 
 def mean(values: List[float]):

@@ -4,6 +4,7 @@ from typing import List, Tuple, Dict
 import sys
 from collections import Counter
 
+
 # Used for typing
 Data = List[List]
 
@@ -260,11 +261,27 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     return node_return
 
     
-def classify(tree, values):
-    raise NotImplementedError
+def classify(tree: DecisionNode, values):
+    #Values it must be a row
+    #Te pasan un arbol y unos valores de una fila, recorrer el arbol encontrando los valores de esa columna y llegar a la ultima hoja que son los resultados. Devuelves hoja y te olvidas
+    if tree.results is not None:
+        return tree.results
+    row = values[0]
+    if tree.value == row:
+        classify(tree.tb,values[1:])
+    else:
+        classify(tree.fb,values[1:])
 
-def prune():
-    raise NotImplementedError#
+def prune(tree: DecisionNode, threshold: float):
+    if tree.tb is not None:
+        if tree.fb is not None:
+            if tree.tb.results is not None and tree.fb.results is not None:
+                print(tree.tb.results)
+                print(tree.fb.results)
+            else:
+                prune(tree.tb,threshold)
+                prune(tree.fb,threshold)
+        
 
 
 
@@ -322,7 +339,7 @@ def main():
         print("entropy set1:",entropy(set1))
         print("entropy set2:",entropy(set2))
     """
-
+    """
     #tree = buildtree(data)
     #print_tree(tree,headres)
     tree = iterative_buildtree(data)
@@ -330,7 +347,11 @@ def main():
     print_tree(tree,headres)
     print("----------")
     print_tree(tree2,headres)
-
+    """
+    tree = buildtree(data)
+    prune(tree,0.09)
+    things = classify(tree,data[0])
+    print(things)
     """
     print(headres)
         for row in data:
