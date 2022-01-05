@@ -320,6 +320,7 @@ def prune(tree: DecisionNode, threshold: float):
             if tree.tb.results is not None and tree.fb.results is not None:
                 if tree.impurity > threshold:
                     tree.results = Counter()
+                    #Results es un diccionari el cual conte com a key l'etiqueta de les dades y com a valor, el nombre de cops que apareix l'etiqueta
                     tree.results[0] = tree.tb.results
                     tree.results[1] = tree.fb.results
                     tree.fb = None
