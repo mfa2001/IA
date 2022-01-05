@@ -25,6 +25,7 @@ def train_test_split(dataset, test_size: Union[float, int], seed=None):
 
 
 def get_accuracy(classifier: DecisionNode, dataset):
+    #Contar las veces que se classifican correctamente, es decir passan por TB los datos de dataset
     classify =  {}
     for data in dataset[-1]:
         classify[data] =+1
