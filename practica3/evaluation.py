@@ -1,8 +1,7 @@
 import random
 from typing import Union, List
 
-from treepredict import DecisionNode
-
+import treepredict
 
 def train_test_split(dataset, test_size: Union[float, int], seed=None):
     if seed:
@@ -36,4 +35,7 @@ def mean(values: List[float]):
 
 
 def cross_validation(dataset, k, agg, seed, scoref, beta, threshold):
+    agg = mean(dataset)
+    scoref = treepredict.entropy()
+    beta = 0
     raise NotImplementedError
