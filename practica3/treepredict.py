@@ -106,7 +106,7 @@ def divideset(part: Data, column: int, value: int) -> Tuple[Data, Data]:
 
 
 class DecisionNode:
-    def __init__(self, col=-1, value=None, results=None, tb=None, fb=None):
+    def __init__(self, col=-1, value=None, results=None, tb=None, fb=None,impurity = None):
         """
         t8: We have 5 member variables:
         - col is the column index which represents the
@@ -123,7 +123,12 @@ class DecisionNode:
         self.results = results
         self.tb = tb
         self.fb = fb
+        self.impurity = impurity
 
+def _gain(part: Data, set1: Data, set2: Data, scoref):
+    p1 = len(set1) / len(part)
+    p2 = len(set2) / len(part)
+    return scoref(part) - p1 * scoref(set1) - p2 * scoref(set2)
 
 def buildtree(part: Data, scoref=entropy, beta=0):
     """
@@ -139,12 +144,47 @@ def buildtree(part: Data, scoref=entropy, beta=0):
     """
     if len(part) == 0:
         return DecisionNode()
+
+    current_score = scoref(part)
+
+    if current_score == 0:
+        # The partition is pure
+        return DecisionNode(results=unique_counts(part),impurity=current_score)
+
+    # Set up some variables to track the best criteria
+    best_gain = 0
+    best_criteria = None
+    best_sets = None
+
+    n_cols = len(part[0]) - 1  # Skip the label
+
+    for i in range(n_cols):
+        possibles_cut_values = set()
+        for row in part:
+            possibles_cut_values.add(row[i])
+
+        for value in possibles_cut_values:
+            set1, set2 = divideset(part, i, value)
+            gain = _gain(part, set1, set2, scoref)
+            if gain > best_gain:
+                best_gain = gain
+                best_criteria = (i, value)
+                best_sets = set1, set2
+
+    if best_gain < beta:
+        return DecisionNode(results=unique_counts(part),impurity=current_score)
+
+    return DecisionNode(col=best_criteria[0], value=best_criteria[1],
+        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]),impurity=current_score)
+    """
+    if len(part) == 0:
+        return DecisionNode()
     #1-Calcular impureza
     current_score = scoref(part)
     #No usamos Beta
     if current_score == 0:
         return DecisionNode(
-            results=unique_counts(part)
+            results=unique_counts(part),impurity=current_score
         )
     
 
@@ -172,8 +212,8 @@ def buildtree(part: Data, scoref=entropy, beta=0):
         return DecisionNode(results = unique_counts(part))
 
     return DecisionNode(col=best_criteria[0], value=best_criteria[1],
-        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]))
-    
+        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]),impurity=current_score)
+    """
     """
     Scoref representa el indice de impureza
 
@@ -212,9 +252,9 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
     data.append(part)
     i = 0 
     while len(nodes) != 0:
-        data_part :DecisionNode = data.pop() 
+        data_part  = data.pop() 
         # Set up some variables to track the best criteria
-        curr_node = nodes.pop()
+        curr_node :DecisionNode = nodes.pop()
         i+=1
         best_gain = 0
         best_criteria = None
@@ -228,6 +268,7 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
         #No usamos Beta
         if current_score == 0:
             curr_node.results = unique_counts(data_part)
+            curr_node.impurity = current_score
             continue
         for col_idx in range(n_cols):
             for value in _get_values(data_part,col_idx):
@@ -243,6 +284,7 @@ def iterative_buildtree(part: Data, scoref=entropy, beta=0):
             curr_node.results = unique_counts(data_part)
         curr_node.col = best_criteria[0]
         curr_node.value = best_criteria[1]
+        curr_node.impurity = current_score
         curr_node.tb = DecisionNode()
         nodes.append(curr_node.tb)
         data.append(best_sets[0])
@@ -276,11 +318,16 @@ def prune(tree: DecisionNode, threshold: float):
     if tree.tb is not None:
         if tree.fb is not None:
             if tree.tb.results is not None and tree.fb.results is not None:
-                print(tree.tb.results)
-                print(tree.fb.results)
+                if tree.impurity > threshold:
+                    tree.results = Counter()
+                    tree.results[0] = tree.tb.results
+                    tree.results[1] = tree.fb.results
+                    tree.fb = None
+                    tree.tb = None
             else:
-                prune(tree.tb,threshold)
-                prune(tree.fb,threshold)
+                return DecisionNode(col=tree.col,value=tree.value,results=tree.results,
+                tb=prune(tree.tb,threshold),fb=prune(tree.fb,threshold),impurity=tree.impurity)
+
         
 
 
@@ -349,7 +396,9 @@ def main():
     print_tree(tree2,headres)
     """
     tree = buildtree(data)
-    prune(tree,0.09)
+    print_tree(tree)
+    newtree = prune(tree,0.09)
+    print_tree(newtree)
     things = classify(tree,data[0])
     print(things)
     """
