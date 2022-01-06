@@ -1,6 +1,7 @@
 import random
 from typing import Union, List
 import sys
+import numpy as np
 
 
 import treepredict
@@ -46,7 +47,7 @@ def get_accuracy(classifier: treepredict.DecisionNode, dataset):
 
                 
 def split_dataset(data,k):
-    splited_dara = numpy       
+    return np.array_split(data,k)       
 
 
 
@@ -72,6 +73,7 @@ Output: Score sc
 12: end procedure
 
     """
+    data_split = split_dataset(dataset,k)
     agg = mean(dataset)
     scoref = treepredict.entropy()
     beta = 0

@@ -307,7 +307,13 @@ def classify(tree: DecisionNode, values):
     #Values it must be a row
     #Te pasan un arbol y unos valores de una fila, recorrer el arbol encontrando los valores de esa columna y llegar a la ultima hoja que son los resultados. Devuelves hoja y te olvidas
     if tree.results is not None:
-        return tree.results
+        biggest_value = 0
+        valor = None
+        for value in tree.results.values():
+            if value > biggest_value:
+                biggest_value = value
+                #Guardar la etiqueta y devolverla
+        return biggest_value #!cambiar por la etiqueta
     row = values[0]
     if tree.value == row:
         classify(tree.tb,values[1:])
@@ -407,10 +413,14 @@ def main():
     print("----------")
     print_tree(tree2,headres)
     """
+    """
     tree = buildtree(data)
     print_tree(tree)
     newtree = prune(tree,0.09) #Arrglar //un node es fique a null no se perque
     print_tree(newtree)
+    
+    """
+    tree = buildtree(data)
     things = classify(tree,data[0])
     print(things)
 
