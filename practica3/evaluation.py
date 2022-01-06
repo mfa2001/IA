@@ -1,5 +1,7 @@
 import random
 from typing import Union, List
+import sys
+
 
 import treepredict
 
@@ -23,11 +25,29 @@ def train_test_split(dataset, test_size: Union[float, int], seed=None):
     return train, test
 
 
-def get_accuracy(classifier: DecisionNode, dataset):
+def get_accuracy(classifier: treepredict.DecisionNode, dataset):
     #Contar las veces que se classifican correctamente, es decir passan por TB los datos de dataset
-    classify =  {}
-    for data in dataset[-1]:
-        classify[data] =+1
+    accuracy = 0
+    for row_data in dataset:
+        curr_node = classifier
+        for data in row_data:
+            if curr_node.results is None:
+                if data == curr_node.value:
+                    curr_node = curr_node.tb
+                else:
+                    curr_node = curr_node.fb
+            else:
+                predict = row_data[-1]
+                if predict in curr_node.results:
+                    accuracy+=1
+                else:
+                    break
+    return accuracy
+
+                
+def split_dataset(data,k):
+    splited_dara = numpy       
+
 
 
 def mean(values: List[float]):
@@ -35,7 +55,36 @@ def mean(values: List[float]):
 
 
 def cross_validation(dataset, k, agg, seed, scoref, beta, threshold):
+    """
+    Input: Dataset S, number of folds k, model arguments args
+Output: Score sc
+1: procedure Cross Validation(S, k)
+2: F0, F1, ..., Fk ← split dataset(S, k) ▷ Separate in k folds
+3: scores ← ∅
+4: for i ∈ [0, k − 1] do
+5: Strain ← S\Fi ▷ Use all the data but the fold selected
+6: Seval ← Fi
+7: model ← train model(Strain, args)
+8: scorei ← score model(model, Seval)
+9: scores ← scores ∪ scorei
+10: end for
+11: sc ← aggregate(scores) ▷ For example, apply the mean
+12: end procedure
+
+    """
     agg = mean(dataset)
     scoref = treepredict.entropy()
     beta = 0
     raise NotImplementedError
+
+def main():
+    try:   
+        filename = sys.argv[1]
+    except IndexError:
+        filename = "decision_tree_example.txt"
+    headres,data = treepredict.read(filename)
+
+    acc = get_accuracy(treepredict.buildtree(data),data)
+    print(acc)
+if __name__=="__main__":
+    main()

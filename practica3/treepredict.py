@@ -315,20 +315,31 @@ def classify(tree: DecisionNode, values):
         classify(tree.fb,values[1:])
 
 def prune(tree: DecisionNode, threshold: float):
-    if tree.tb is not None:
-        if tree.fb is not None:
-            if tree.tb.results is not None and tree.fb.results is not None:
-                if tree.impurity > threshold:
-                    tree.results = Counter()
-                    #Results es un diccionari el cual conte com a key l'etiqueta de les dades y com a valor, el nombre de cops que apareix l'etiqueta
-                    tree.results[0] = tree.tb.results
-                    tree.results[1] = tree.fb.results
-                    tree.fb = None
-                    tree.tb = None
+    if tree.tb is not None and tree.fb is not None:
+        if tree.tb.results is not None and tree.fb.results is not None:
+            tree.results = Counter()
+            imp = tree.impurity
+            tree.impurity = 0
+            #Results es un diccionari el cual conte com a key l'etiqueta de les dades y com a valor, el nombre de cops que apareix l'etiqueta
+            for res in tree.tb.results:
+                tree.results[res] = tree.tb.results[res]
+            for res in tree.fb.results:
+                tree.results[res] = tree.fb.results[res]
+            total = len(tree.results)
+            for value in tree.results.values():
+                p = (value/total)
+                tree.impurity -= (p*_log2(p))
+            if tree.impurity > threshold:
+                tree.fb = None
+                tree.tb = None
             else:
-                return DecisionNode(col=tree.col,value=tree.value,results=tree.results,
-                tb=prune(tree.tb,threshold),fb=prune(tree.fb,threshold),impurity=tree.impurity)
-
+                tree.impurity = imp
+                tree.results = None
+        else:
+            return DecisionNode(col=tree.col,value=tree.value,results=tree.results,
+            tb=prune(tree.tb,threshold),fb=prune(tree.fb,threshold),impurity=tree.impurity)
+    else:
+        return tree
         
 
 
@@ -398,10 +409,12 @@ def main():
     """
     tree = buildtree(data)
     print_tree(tree)
-    newtree = prune(tree,0.09)
+    newtree = prune(tree,0.09) #Arrglar //un node es fique a null no se perque
     print_tree(newtree)
     things = classify(tree,data[0])
     print(things)
+
+    
     """
     print(headres)
         for row in data:
