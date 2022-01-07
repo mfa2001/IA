@@ -308,17 +308,18 @@ def classify(tree: DecisionNode, values):
     #Te pasan un arbol y unos valores de una fila, recorrer el arbol encontrando los valores de esa columna y llegar a la ultima hoja que son los resultados. Devuelves hoja y te olvidas
     if tree.results is not None:
         biggest_value = 0
-        valor = None
-        for value in tree.results.values():
+        biggest_key = None
+        for key,value in tree.results.items():
             if value > biggest_value:
                 biggest_value = value
+                biggest_key = key
                 #Guardar la etiqueta y devolverla
-        return biggest_value #!cambiar por la etiqueta
+        return biggest_key #!cambiar por la etiqueta
     row = values[0]
     if tree.value == row:
-        classify(tree.tb,values[1:])
+        return classify(tree.tb,values[1:])
     else:
-        classify(tree.fb,values[1:])
+        return classify(tree.fb,values[1:])
 
 def prune(tree: DecisionNode, threshold: float):
     if tree.tb is not None and tree.fb is not None:
@@ -336,11 +337,13 @@ def prune(tree: DecisionNode, threshold: float):
                 p = (value/total)
                 tree.impurity -= (p*_log2(p))
             if tree.impurity > threshold:
+                #LA impourezsa generada por los hijos se pone al padre?
                 tree.fb = None
                 tree.tb = None
             else:
                 tree.impurity = imp
                 tree.results = None
+            return tree
         else:
             return DecisionNode(col=tree.col,value=tree.value,results=tree.results,
             tb=prune(tree.tb,threshold),fb=prune(tree.fb,threshold),impurity=tree.impurity)
@@ -413,17 +416,18 @@ def main():
     print("----------")
     print_tree(tree2,headres)
     """
-    """
-    tree = buildtree(data)
+    
+    tree = iterative_buildtree(data)
     print_tree(tree)
+    print("-------------------------")
     newtree = prune(tree,0.09) #Arrglar //un node es fique a null no se perque
     print_tree(newtree)
     
     """
     tree = buildtree(data)
-    things = classify(tree,data[0])
+    things = classify(tree,data[3])
     print(things)
-
+    """
     
     """
     print(headres)

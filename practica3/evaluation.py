@@ -41,9 +41,8 @@ def get_accuracy(classifier: treepredict.DecisionNode, dataset):
                 predict = row_data[-1]
                 if predict in curr_node.results:
                     accuracy+=1
-                else:
-                    break
-    return accuracy
+                break
+    return accuracy/len(dataset)
 
                 
 def split_dataset(data,k):
@@ -55,7 +54,7 @@ def mean(values: List[float]):
     return sum(values) / len(values)
 
 
-def cross_validation(dataset, k, agg, seed, scoref, beta, threshold):
+def cross_validation(dataset: list, k, agg, seed, scoref, beta, threshold):
     """
     Input: Dataset S, number of folds k, model arguments args
 Output: Score sc
@@ -73,11 +72,17 @@ Output: Score sc
 12: end procedure
 
     """
-    data_split = split_dataset(dataset,k)
-    agg = mean(dataset)
-    scoref = treepredict.entropy()
-    beta = 0
-    raise NotImplementedError
+    _,data_split_test = train_test_split(dataset=dataset,test_size=k)
+    scores = []
+    for data in data_split_test:
+        index = dataset.index(data)
+        dataset.remove(data)
+        model_tree = treepredict.buildtree(dataset,scoref,beta)
+        model_tree_pruned = treepredict.prune(model_tree,threshold)
+        scores.append(get_accuracy(model_tree_pruned,data_split_test))
+        dataset.insert(index,data)
+    sc = agg(scores)
+    return sc
 
 def main():
     try:   
@@ -86,7 +91,9 @@ def main():
         filename = "decision_tree_example.txt"
     headres,data = treepredict.read(filename)
 
-    acc = get_accuracy(treepredict.buildtree(data),data)
-    print(acc)
+    #acc = get_accuracy(treepredict.buildtree(data),data)
+    #print(acc)
+    sc_crval = cross_validation(dataset=data,k=6,agg=mean,seed=None,scoref=treepredict.entropy,beta=0,threshold=0.09)
+    print(sc_crval)
 if __name__=="__main__":
     main()
