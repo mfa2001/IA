@@ -111,7 +111,7 @@ def main():
     tree = treepredict.buildtree(train)
     print(get_accuracy(tree,test))
 
-    #best threshold ~= 0.2
+    #best threshold ~= 0.2 COMENTAR
     
 
 
