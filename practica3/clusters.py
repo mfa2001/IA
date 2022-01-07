@@ -111,3 +111,10 @@ def kcluster(rows, distance, k=4):
     # TODO
     raise NotImplementedError
 
+def main():
+    data = readfile()
+    
+if __name__=="__main__":
+    main()
+
+

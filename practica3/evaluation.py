@@ -1,8 +1,7 @@
+import math
 import random
 from typing import Union, List
 import sys
-import numpy as np
-
 
 import treepredict
 
@@ -45,11 +44,19 @@ def get_accuracy(classifier: treepredict.DecisionNode, dataset):
     return accuracy/len(dataset)
 
                 
-def split_dataset(data,k):
-    return np.array_split(data,k)       
-
-
-
+def split_dataset(data: list(),k):
+    splited_list = list()
+    spliting = list()
+    for _ in range(k):
+        size = round(len(data)/k)
+        for i in range(size):
+            spliting.append(data[i])
+        splited_list.append(spliting)
+        spliting = list()
+        k-=1
+        data = data[size:]
+    return splited_list 
+    
 def mean(values: List[float]):
     return sum(values) / len(values)
 
@@ -72,15 +79,15 @@ Output: Score sc
 12: end procedure
 
     """
-    _,data_split_test = train_test_split(dataset=dataset,test_size=k)
+    data_splited = split_dataset(dataset,k)
     scores = []
-    for data in data_split_test:
-        index = dataset.index(data)
-        dataset.remove(data)
-        model_tree = treepredict.buildtree(dataset,scoref,beta)
+    for row_data in data_splited:
+        usable_data = list(dataset)
+        for data in row_data:
+            usable_data.remove(data)
+        model_tree = treepredict.buildtree(usable_data,scoref,beta)
         model_tree_pruned = treepredict.prune(model_tree,threshold)
-        scores.append(get_accuracy(model_tree_pruned,data_split_test))
-        dataset.insert(index,data)
+        scores.append(get_accuracy(model_tree_pruned,row_data))
     sc = agg(scores)
     return sc
 
@@ -88,12 +95,25 @@ def main():
     try:   
         filename = sys.argv[1]
     except IndexError:
-        filename = "decision_tree_example.txt"
+        filename = "iris.csv"
     headres,data = treepredict.read(filename)
 
     #acc = get_accuracy(treepredict.buildtree(data),data)
     #print(acc)
+    """
     sc_crval = cross_validation(dataset=data,k=6,agg=mean,seed=None,scoref=treepredict.entropy,beta=0,threshold=0.09)
     print(sc_crval)
+    """
+    train,test = train_test_split(data,10)
+    sc = cross_validation(dataset=train,k=4,agg=mean,seed=None,scoref=treepredict.entropy,beta=0,threshold=0.2)
+    print(sc)
+    
+    tree = treepredict.buildtree(train)
+    print(get_accuracy(tree,test))
+
+    #best threshold ~= 0.2
+    
+
+
 if __name__=="__main__":
     main()
