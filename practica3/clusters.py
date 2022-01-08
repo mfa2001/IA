@@ -138,16 +138,42 @@ def kcluster(rows, distance=pearson, k=4):
                 for j in range(len(avgs)):
                     avgs[j]/=len(bestmatches[i])
                 clusters[i]=avgs
-    return bestmatches
+    total = list()
+    i = -1
+    dist = 0
+    centr = list()
+    centr_list = list()
+    for bestm in bestmatches:
+
+        i+=1
+        if len(bestm)!= 0:
+            centr.append(clusters[i])
+            for best in bestm:
+                dist += pearson(clusters[i],rows[best]) #No entiendo como calcular la distancia con euclidean, por eso uso pearson
+            centr_list.append(dist)
+    total.append(centr)
+    total.append(centr_list)
+
+    total_return = tuple(total)
+    
+    return total_return
+
+    
 
     #kclus = tuple()
 
 
 def main():
+    """
     blognames, word, data = readfile('blogdata.txt')
     kclust = kcluster(data,k=10)
     print([blognames[r] for r in kclust[0]])
-    print([blognames[r] for r in kclust[1]])
+    print([blognames[r] for r in kclust[1]])    
+    """
+    blognames, word, data = readfile('blogdata.txt')
+    centroides,distances = kcluster(data,k=2)
+    for i in range(len(centroides)):
+        print("For centroid: " + str(centroides[i]) + " have a total distance of: " + str(distances[i]))
     
 if __name__=="__main__":
     main()
