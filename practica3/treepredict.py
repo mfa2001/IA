@@ -177,44 +177,6 @@ def buildtree(part: Data, scoref=entropy, beta=0):
     return DecisionNode(col=best_criteria[0], value=best_criteria[1],
         tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]),impurity=current_score)
     """
-    if len(part) == 0:
-        return DecisionNode()
-    #1-Calcular impureza
-    current_score = scoref(part)
-    #No usamos Beta
-    if current_score == 0:
-        return DecisionNode(
-            results=unique_counts(part),impurity=current_score
-        )
-    
-
-    # Set up some variables to track the best criteria
-    best_gain = 0
-    best_criteria = None
-    best_sets = None
-
-    n_cols = len(part[0]) -1
-
-
-    #2-Buscar mejor pregunta
-    for col_idx in range(n_cols):
-        for value in _get_values(part,col_idx):
-            set1, set2 = divideset(part,col_idx,value)
-            dism_true = len(set1) / len(part) * scoref(set1)
-            dism_false = len(set2) / len(part) *scoref(set2)
-            gain = current_score - dism_true - dism_false
-            if gain > best_gain:
-                best_gain = gain
-                best_criteria = (col_idx,value)
-                best_sets = set1,set2
-    #Usamos beta, Logica de beta
-    if best_gain < beta:
-        return DecisionNode(results = unique_counts(part))
-
-    return DecisionNode(col=best_criteria[0], value=best_criteria[1],
-        tb=buildtree(best_sets[0]), fb=buildtree(best_sets[1]),impurity=current_score)
-    """
-    """
     Scoref representa el indice de impureza
 
     Cada particion disminuye la impureza por ello a mas ganancia, la impureza estara mas reduida.
@@ -407,6 +369,7 @@ def main():
         print("entropy set1:",entropy(set1))
         print("entropy set2:",entropy(set2))
     """
+    
     """
     #tree = buildtree(data)
     #print_tree(tree,headres)
@@ -416,13 +379,14 @@ def main():
     print("----------")
     print_tree(tree2,headres)
     """
-    
+
+    """
     tree = iterative_buildtree(data)
     print_tree(tree)
     print("-------------------------")
     newtree = prune(tree,0.09) #Arrglar //un node es fique a null no se perque
     print_tree(newtree)
-    
+    """
     """
     tree = buildtree(data)
     things = classify(tree,data[3])

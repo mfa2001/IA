@@ -108,10 +108,15 @@ def main():
     sc = cross_validation(dataset=train,k=4,agg=mean,seed=None,scoref=treepredict.entropy,beta=0,threshold=0.2)
     print(sc)
     
-    tree = treepredict.buildtree(train)
-    print(get_accuracy(tree,test))
+    acc_sum = 0
+    ty = 10
+    for n in range(ty):
+        tree = treepredict.buildtree(train)
+        acc_sum += get_accuracy(tree,test)
+    print("The mean of accuracy: " + str(acc_sum/ty))
+    
 
-    #best threshold ~= 0.2 COMENTAR
+    #best threshold ~= 0.25 COMENTAR
     
 
 

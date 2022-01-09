@@ -1,6 +1,9 @@
 from typing import Tuple, List
 from math import sqrt
 import random
+import matplotlib.pyplot as plt
+
+
 
 
 def readfile(filename: str) -> Tuple[List, List, List]:
@@ -108,13 +111,43 @@ def printclust(clust: BiCluster, labels=None, n=0):
 
 
 # ......... K-MEANS ..........
-def kcluster(rows, distance=pearson, k=4):
-    # Determine the minimum and maximum values for each point
+def kcluster(rows, distance=pearson, k=4,try_times = 5):
     ranges=[(min([row[i] for row in rows]),
     max([row[i] for row in rows])) for i in range(len(rows[0]))]
     # Create k randomly placed centroids
     clusters=[[random.random()*(ranges[i][1]-ranges[i][0])+ranges[i][0] for i in range(len(rows[0]))] for j in range(k)]
     lastmatches=None
+    best_distances={}
+    for ty in range(try_times):
+        distances={}
+        for j in range(len(rows)):
+            row=rows[j]
+            bestmatch=0
+            for i in range(k):
+                d=distance(clusters[i],row)
+                d2 = distance(clusters[bestmatch],row)
+                if d<d2: 
+                    bestmatch=i
+                    best_dist = d
+                else:
+                    best_dist = d2
+            distances[j] = best_dist
+        minus = 0
+        count = 0
+        if ty == 0:
+            best_distances = distances
+            best_clusters = clusters
+        else:
+            for n in range(len(rows)):
+                count+=1
+                if best_distances[n] > distances[n]:
+                    minus+=1
+            if count/2 < float(minus):
+                best_distances = distances
+                best_clusters = clusters
+        clusters=[[random.random()*(ranges[i][1]-ranges[i][0])+ranges[i][0] for i in range(len(rows[0]))] for j in range(k)]      
+
+    clusters = best_clusters
     for t in range(100):
         bestmatches=[[] for i in range(k)]
     # Find which centroid is the closest for each row
@@ -140,11 +173,10 @@ def kcluster(rows, distance=pearson, k=4):
                 clusters[i]=avgs
     total = list()
     i = -1
-    dist = 0
     centr = list()
     centr_list = list()
     for bestm in bestmatches:
-
+        dist = 0
         i+=1
         if len(bestm)!= 0:
             centr.append(clusters[i])
@@ -158,6 +190,7 @@ def kcluster(rows, distance=pearson, k=4):
     
     return total_return
 
+
     
 
     #kclus = tuple()
@@ -170,10 +203,27 @@ def main():
     print([blognames[r] for r in kclust[0]])
     print([blognames[r] for r in kclust[1]])    
     """
-    blognames, word, data = readfile('blogdata.txt')
-    centroides,distances = kcluster(data,k=2)
+    blognames, word, data = readfile('blogdata_full.txt')
+    #centroides,distances = kcluster(data,k=10,try_times=5)
+    distortions = []
+    krange = range(1,10)
+    print("Sum of distances for n 'k' ")
+    for kmean in krange:
+        _,distances = kcluster(data,k=kmean,try_times=5)
+        distortions.append(sum(distances))
+        print(distortions[kmean-1])
+    plt.figure(figsize=(16,8))
+    plt.plot(krange,distortions, 'bx-')
+    plt.xlabel('krange')
+    plt.ylabel('Distortion')
+    plt.title('The Elbow Method showing the optimal k')
+    plt.show()
+
+    """
     for i in range(len(centroides)):
         print("For centroid: " + str(centroides[i]) + " have a total distance of: " + str(distances[i]))
+    """
+    
     
 if __name__=="__main__":
     main()
